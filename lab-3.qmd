@@ -106,6 +106,10 @@ Get to know the data.
 
 a.  `glimpse()` at the `country_inflation` data frame and answer the following questions based on the output. How many rows does `country_inflation` have and what does each row represent? How many columns does `country_inflation` have and what does each column represent?
 
+    ```{r}
+    glimpse(country_inflation)
+    ```
+
 The dataset contains 44 rows and 30 columns. Each row represents a country, while the columns include a country identifier and inflation values for each years from 1993 to 2021.
 
 b\. Display a list of the countries included in the dataset.
@@ -348,7 +352,19 @@ cpi_divisions <- read_csv("data/cpi-divisions.csv")
 
 a\. How many columns and how many rows does the `us_inflation` dataset have? What are the variables in it? Add a brief (1-2 sentences) narrative summarizing this information.
 
+```{r}
+glimpse(us_inflation)
+```
+
+The us_inflation dataset contains 132 rows and 4 columns. The variables include country, cpi_division_id, year, and annual_inflation, where each row represents the inflation rate for the United States for a specific CPI division and year.
+
 b\. How many columns and how many rows does the `cpi_divisions` dataset have? What are the variables in it? Add a brief (1-2 sentences) narrative summarizing this information.
+
+```{r}
+glimpse(cpi_divisions)
+```
+
+The cpi_divisions dataset contains 12 rows and 2 columns. The variables are id and description, where each row represents a CPI division category and the description provides the name of the category used in the Consumer Price Index classification.
 
 c\. Create a new dataset by joining the `us_inflation` dataset with the `cpi_division_id` dataset.
 
@@ -360,15 +376,44 @@ c\. Create a new dataset by joining the `us_inflation` dataset with the `cpi_div
 
 Then, find the number of rows and columns of the resulting dataset and report the names of its columns. Add a brief (1-2 sentences) narrative summarizing this information.
 
+```{r}
+us_inflation_joined <- us_inflation %>%
+  left_join(cpi_divisions, by = c("cpi_division_id" = "id"))
+
+glimpse(us_inflation_joined)
+```
+
+The joined dataset us_inflation_joined contains 132 rows and 5 columns. It includes the variables country, cpi_division_id, year, annual_inflation, and description, where the description column provides the CPI division name associated with each inflation observation.
+
 ### Question 9
 
 a\. Create a vector called `divisions_of_interest` which contains the descriptions or IDs of CPI divisions you want to visualize. Your `divisions_of_interest` should consist of no more than five divisions. If you're using descriptions, make sure that the spelling of your divisions matches how they appear in the dataset. Then, in 1-2 sentences, state why you chose these divisions.
+
+```{r}
+divisions_of_interest <- c(
+  "Food and non-Alcoholic beverages",
+  "Housing, water, electricity, gas and other fuels",
+  "Transport",
+  "Health",
+  "Education"
+)
+```
+
+These divisions were chosen because I think they represent major categories of everyday spending, and I want to explore how inflation is affecting the essentials in a household's expenditure.
 
 ::: callout-tip
 Refer back to the guidance provided in [Question 6] if you're not sure how to create this vector.
 :::
 
 b\. In a single pipeline, filter your reshaped dataset to include only the `divisions_of_interest` from part (a), and save the resulting data frame with a new name so you (1) can refer to this data frame later in your analysis and (2) do not overwrite the data frame you're starting with. Use a short but informative name. Then, in a new pipeline, find the `distinct()` divisions in the data frame you created.
+
+```{r}
+inflation_divisions <- us_inflation_joined %>%
+  filter(description %in% divisions_of_interest)
+
+inflation_divisions %>%
+  distinct(description)
+```
 
 ### Question 10
 
@@ -382,13 +427,28 @@ Using your data frame from the previous question, create a plot of annual inflat
 -   If your legend has labels that are too long, you can try moving the legend to the bottom and stack the labels vertically. *Hint:* The `legend.position` and `legend.direction` arguments of the `theme()` functions will be useful.
 
 ```{r}
-ggplot(...) +
-  ... +
+ggplot(inflation_divisions, 
+       aes(x = year, y = annual_inflation,
+           color = description, shape = description, group = description)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  labs(
+    x = "Year",
+    y = "Annual inflation rate",
+    color = "CPI division",
+    shape = "CPI division",
+    title = "Annual inflation rates over time by CPI division in the United States",
+    subtitle = "Selected CPI divisions"
+  ) +
+  scale_color_brewer(palette = "Dark2") +
+  theme_minimal() +
   theme(
-    legend.position = "bottom", 
+    legend.position = "bottom",
     legend.direction = "vertical"
   )
 ```
+
+The plot shows that inflation rates for most of the selected CPI divisions, including education, health, food and non-alcoholic beverages, and housing, water, electricity, gas and other fuels, remain relatively stable over time with only moderate fluctuations. In contrast, the transport division displays much larger variability, with noticeable spikes and drops across several years. I found this somewhat surprising because I initially expected essential categories such as food and housing to show larger fluctuations compared to transport. However, I do not have extensive knowledge of the United States economy, so this pattern may reflect economic factors affecting transportation costs, such as changes in fuel prices.
 
 ::: render-commit-push
 If you haven't yet done so since Part 1, now is a good time to render, commit, and push. Make sure that you commit and push all changed documents and your Git pane is completely empty before proceeding.
