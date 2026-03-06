@@ -227,7 +227,7 @@ c\. Putting (a) and (b) together: What are the highest and the lowest inflation 
 ```{r}
 country_inflation_long %>%
   filter(
-    annual_inflation == max(annual_inflation, na.rm = TRUE),
+    annual_inflation == max(annual_inflation, na.rm = TRUE) |
     annual_inflation == min(annual_inflation, na.rm = TRUE)
   )
 ```
@@ -254,11 +254,31 @@ So on and so forth... Then, in 1-2 sentences, state why you chose these countrie
 Your `countries_of_interest` should consist of no more than five countries. Make sure that the spelling of your countries matches how they appear in the dataset.
 :::
 
+```{r}
+countries_of_interest <- c(
+  "Australia",
+  "Austria",
+  "Belgium",
+  "Canada",
+  "Czech Republic"
+)
+```
+
+The selected countries are Australia, Austria, Belgium, Canada, and the Czech Republic. These countries were chosen because they are the first five countries appearing in the dataset when listed in alphabetical order.
+
 b\. In a single pipeline, filter your reshaped dataset to include only the `countries_of_interest` from part (a), and save the resulting data frame with a new name so you (1) can refer to this data frame later in your analysis and (2) do not overwrite the data frame you're starting with. Use a short but informative name. Then, in a new pipeline, find the `distinct()` countries in the data frame you created.
 
 ::: callout-tip
 The number of distinct countries in the filtered data frame you created in part (b) should equal the number of countries you chose in part (a). If it doesn't, you might have misspelled a country name or made a mistake in how to filter for these countries. Go back and check your code.
 :::
+
+```{r}
+country_interest_subset <- country_inflation_long %>%
+  filter(country %in% countries_of_interest)
+
+country_interest_subset %>%
+  distinct(country)
+```
 
 ### Question 7
 
@@ -271,6 +291,25 @@ Requirements for the plot:
 -   Axes and legend should be properly labeled.
 -   The plot should have an appropriate title (and optionally a subtitle).
 -   Plot should be customized in at least one way – you could use a different than default color scale, or different than default theme, or some other customization.
+
+```{r}
+ggplot(country_interest_subset, aes(x = year, y = annual_inflation,
+                             color = country, shape = country, group = country)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  labs(
+    x = "Year",
+    y = "Annual inflation rate",
+    color = "Country",
+    shape = "Country",
+    title = "Annual inflation rates over time",
+    subtitle = "Australia, Austria, Belgium, Canada, and Czech Republic"
+  ) +
+  scale_color_brewer(palette = "Dark2") +
+  theme_minimal()
+```
+
+The plot shows the annual inflation rates for Australia, Austria, Belgium, Canada, and the Czech Republic between 1993 and 2021. Overall, the inflation rates for Australia, Austria, Belgium, and Canada appear relatively stable over time, generally remaining within a moderate range with only small fluctuations. In contrast, the Czech Republic shows much larger fluctuations, particularly in the earlier years, where inflation rates are significantly higher before declining and stabilizing later. This was surprising to me because I do not have much background knowledge about the Czech Republic’s economy. Without that economic context, the noticeably greater volatility in its inflation rates compared to the other four countries stands out as unexpected.
 
 ::: render-commit-push
 If you haven't yet done so, now is a good time to render, commit, and push. Make sure that you commit and push all changed documents and your Git pane is completely empty before proceeding.
