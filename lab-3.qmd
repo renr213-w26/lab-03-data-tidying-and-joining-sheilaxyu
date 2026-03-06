@@ -1,6 +1,9 @@
 ---
 title: "Lab 3 - Data tidying and joining"
 categories: "Lab"
+author: "Sheila Yu"
+date: "March 6, 2026"
+format:html
 ---
 
 # Introduction
@@ -103,11 +106,19 @@ Get to know the data.
 
 a.  `glimpse()` at the `country_inflation` data frame and answer the following questions based on the output. How many rows does `country_inflation` have and what does each row represent? How many columns does `country_inflation` have and what does each column represent?
 
-b.  Display a list of the countries included in the dataset.
+The dataset contains 44 rows and 30 columns. Each row represents a country, while the columns include a country identifier and inflation values for each years from 1993 to 2021.
+
+b\. Display a list of the countries included in the dataset.
 
 ::: callout-tip
 A function that can be useful for part (b) is `pull()`. Check out its documentation for examples of usage.
 :::
+
+```{r}
+country_inflation %>%
+  pull(country) %>%
+  unique()
+```
 
 ### Question 2
 
@@ -116,6 +127,23 @@ Which countries had the top three highest inflation rates in 2021? Your output s
 ::: callout-tip
 Column names that are numbers are not considered "proper" in R, therefore to select them you'll need to surround them with backticks, e.g. `select(` `` ` `` `1993` `` ` `` `)`.
 :::
+
+```{r}
+#Top 3 highest inflation rate in 2021
+country_inflation %>%
+  select(country, `2021`) %>%
+  arrange(desc(`2021`)) %>%
+  slice(1:3)
+```
+
+```{r}
+#inflation rate of the U.S. in 2021
+country_inflation %>%
+  filter(country == "United States") %>%
+  select(country, `2021`)
+```
+
+In 2021, Argentina, Turkiye, and Brazil had the three highest inflation rates in the dataset, at approximately 48.41%, 19.60%, and 8.30%, respectively. In comparison, the United States had an inflation rate of about 4.70% in the same year. This indicates that inflation in these three countries was substantially higher than in the United States, as even the lowest inflation rate among the top three countries was almost double that of the United States. Argentina experienced particularly extreme inflation relative to the others.
 
 ### Question 3
 
@@ -132,6 +160,15 @@ Which country's inflation change is the largest over this time period? Did infla
 ::: callout-tip
 For this question you'll once again need to use variables whose names are numbers (years) in your pipeline. Make sure to surround the names of such variables with backticks (`` ` ``).
 :::
+
+```{r}
+country_inflation %>%
+  mutate(inf_ratio = `2021` / `1993`) %>%
+  arrange(desc(inf_ratio)) %>%
+  select(country, inf_ratio)
+```
+
+The country with largest inflation change ratio is New Zealand, with an inflation ration of approximately 3.06, where the inflation increased between 1993-2021.
 
 ### Question 4
 
@@ -329,5 +366,3 @@ You can earn up to 4 points on each question:
 -   1: Response shows effort and misses many of the rubric items.
 
 -   0: Response does not show sufficient effort or understanding and/or is largely incomplete.
-
-
