@@ -184,6 +184,21 @@ Requirements:
 The remaining questions in Part 1 require the use of the pivoted data frame from Question 4.
 :::
 
+```{r}
+country_inflation_long <- country_inflation %>%
+  pivot_longer(
+    cols = -country,
+    names_to = "year",
+    values_to = "annual_inflation",
+    names_transform = as.numeric
+  )
+
+nrow(country_inflation_long)
+ncol(country_inflation_long)
+```
+
+The resulting data frame has 1276 rows and 3 columns.
+
 ### Question 5
 
 Use a separate, single pipeline to answer each of the following questions.
