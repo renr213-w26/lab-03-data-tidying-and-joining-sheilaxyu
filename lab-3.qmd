@@ -3,7 +3,7 @@ title: "Lab 3 - Data tidying and joining"
 categories: "Lab"
 author: "Sheila Yu"
 date: "March 6, 2026"
-format:html
+format: pdf
 ---
 
 # Introduction
